@@ -110,13 +110,6 @@ def placeTrade():
     except Exception as e:
         print('Error placing trade:', e)
 
-# Example route to place a trade
-@app.route('/api/place-trade')
-def placeTradeRoute():
-    placeTrade()
-    print('Trade placed')
-    return jsonify({'message': 'Trade placed'})
-
 # Prompt for API keys on launch and save them in a separate file
 def promptForAPIKeys():
     api_key = input('Enter your Binance API key: ')
