@@ -55,13 +55,58 @@ def getBollingerBands():
         print('Error fetching Bollinger Bands data:', e)
         return jsonify({'error': 'Internal Server Error'}), 500
 
-# Function to place a trade (example implementation, modify as needed)
+# Function to place a trade using Bollinger Bands strategy
 def placeTrade():
     try:
-        # Place your trade logic here
+        # Fetch historical OHLCV data
+        candles = client.get_historical_klines(symbol, timeframe, period + 2)
 
-        # Log successful trade placement
-        print('Trade placed successfully')
+        # Extract close prices from the candles
+        closes = pd.DataFrame(candles, columns=['Time', 'Open', 'High', 'Low', 'Close', 'Volume', 'Close time', 'Quote asset volume', 'Number of trades', 'Taker buy base asset volume', 'Taker buy quote asset volume', 'Ignore'])
+        closes = closes['Close'].astype(float)
+
+        # Calculate Bollinger Bands
+        upperBand, middleBand, lowerBand = calculateBollingerBands(closes)
+
+        # Get the current price
+        current_price = closes.iloc[-1]
+
+        # Get the previous upper band and lower band values
+        previous_upper_band = upperBand.iloc[-2]
+        previous_lower_band = lowerBand.iloc[-2]
+
+        # Get the current upper band and lower band values
+        current_upper_band = upperBand.iloc[-1]
+        current_lower_band = lowerBand.iloc[-1]
+
+        # Check if the price crossed above the upper band
+        if current_price > previous_upper_band and current_price < current_upper_band:
+            # Place a buy trade here
+            # Replace with your buy trade logic
+            quantity = 0.001  # Example quantity to buy
+            order = client.create_order(
+                symbol=symbol,
+                side='BUY',
+                type='MARKET',
+                quantity=quantity
+            )
+            print('Buy trade placed at price:', current_price)
+            print('Order response:', order)
+
+        # Check if the price crossed below the lower band
+        if current_price < previous_lower_band and current_price > current_lower_band:
+            # Place a sell trade here
+            # Replace with your sell trade logic
+            quantity = 0.001  # Example quantity to sell
+            order = client.create_order(
+                symbol=symbol,
+                side='SELL',
+                type='MARKET',
+                quantity=quantity
+            )
+            print('Sell trade placed at price:', current_price)
+            print('Order response:', order)
+
     except Exception as e:
         print('Error placing trade:', e)
 
