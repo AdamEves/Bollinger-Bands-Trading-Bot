@@ -2,13 +2,7 @@ from flask import Flask, jsonify
 from binance import Client
 import numpy as np
 import pandas as pd
-
-# Set up Binance API credentials
-api_key = 'YOUR_API_KEY'
-api_secret = 'YOUR_API_SECRET'
-
-# Create a Binance client
-client = Client(api_key, api_secret)
+import os
 
 # Set up Flask server
 app = Flask(__name__)
@@ -77,8 +71,38 @@ def placeTradeRoute():
     placeTrade()
     return jsonify({'message': 'Trade placed'})
 
+# Prompt for API keys on launch and save them in a separate file
+def promptForAPIKeys():
+    api_key = input('Enter your Binance API key: ')
+    api_secret = input('Enter your Binance API secret: ')
+
+    # Save API keys to a separate file
+    with open('api_keys.txt', 'w') as f:
+        f.write(f'API_KEY={api_key}\n')
+        f.write(f'API_SECRET={api_secret}\n')
+
+    return api_key, api_secret
+
+# Load API keys from the separate file
+def loadAPIKeys():
+    with open('api_keys.txt', 'r') as f:
+        lines = f.readlines()
+        api_key = lines[0].strip().split('=')[1]
+        api_secret = lines[1].strip().split('=')[1]
+    return api_key, api_secret
+
 # Start the server
 if __name__ == '__main__':
+    if os.path.exists('api_keys.txt'):
+        # Load API keys from the separate file
+        api_key, api_secret = loadAPIKeys()
+    else:
+        # Prompt for API keys on first launch
+        api_key, api_secret = promptForAPIKeys()
+
+    # Create a Binance client
+    client = Client(api_key, api_secret)
+
     # Log server start
     print('Server is running on port', port)
     app.run(port=port)
