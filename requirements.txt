@@ -1,3 +1,5 @@
-binance-api-node
-talib
+binance
+python-Binance
+numpy
+pandas
 flask
