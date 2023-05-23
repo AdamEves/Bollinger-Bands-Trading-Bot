@@ -114,6 +114,7 @@ def placeTrade():
 @app.route('/api/place-trade')
 def placeTradeRoute():
     placeTrade()
+    print('Trade placed')
     return jsonify({'message': 'Trade placed'})
 
 # Prompt for API keys on launch and save them in a separate file
